@@ -1,39 +1,42 @@
-#include <iostream>
-#include <Fl/Fl.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl.H>
+#include <FL/fl_ask.H>
+#include <cstring>
+#include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Buffer.H>
-#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Button.H>
 
-using namespace std;
+// Variáveis globais
+extern Fl_Text_Buffer *textbuf;
+extern int changed;
+extern char filename[256];
 
-int changed = 0;
-char filename[256] = "";
-Fl_Text_Buffer *textbuffer = new Fl_Text_Buffer();
-
-class EditorWindow : public Fl_Double_Window{
+// Classe da janela do editor
+class EditorWindow : public Fl_Double_Window {
 public:
-  EditorWindow(int witdh, int height, const char *t);
-  ~EditorWindow();
+    EditorWindow(int W, int H, const char* title);
+    ~EditorWindow();
 
-  Fl_Window *replace_dlg;
-  Fl_Input *replace_find;
-  Fl_Input *replace_with;
-  Fl_Button *replace_all;
-  Fl_Return_Button *replace_next;
-  Fl_Button *replace_cancel;
-  Fl_Text_Editor *editor;
-  char search[256];
+    Fl_Window *replace_dlg;
+    Fl_Input *replace_find;
+    Fl_Input *replace_with;
+    Fl_Button *replace_all;
+    Fl_Return_Button *replace_next;
+    Fl_Button *replace_cancel;
+
+    Fl_Text_Editor *editor;
+    char search[256];
 };
 
+// Variáveis globais
+Fl_Text_Buffer *textbuf = new Fl_Text_Buffer();
+int changed = 0;
+char filename[256] = "";
 
-w->editor = new Fl_Text_Editor(0, 30, 640, 370);
-w->editor->buffer(textitems);
-
-textbuf->
-
-Fl_Menu_Item menuItems[] = {
+Fl_Menu_Item menuitems[] = {
     {"&File", 0, 0, 0, FL_SUBMENU},
     {"&New File...", 0, (Fl_Callback *)new_cd},
     {"&Open File...", FL_CTRL + 'o', (Fl_Callback *)open_cd},
@@ -57,5 +60,4 @@ void close_cd(Fl_Widget*, void*){}
 void quit_cd(Fl_Widget*, void*){}  
 
 Fl_Menu_Bar *m = new Fl_Menu_Bar(0,0,640,30);
-m->copy(menuItems);
 
