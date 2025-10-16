@@ -1,4 +1,6 @@
 #pragma once
+
+// Inclusões de cabeçalhos da biblioteca FLTK e da biblioteca padrão C++.
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Box.H>
@@ -16,23 +18,46 @@
 #include <iostream>
 #include <FL/Fl_File_Chooser.H> 
 
-// Classe da janela do editor
+/**
+ * @class EditorWindow
+ * @brief Representa a janela principal do editor de texto.
+ *
+ * Herda de Fl_Double_Window para fornecer uma interface gráfica com buffer duplo,
+ * o que melhora a renderização e reduz o flickering.
+ */
 class EditorWindow : public Fl_Double_Window {
 public:
+    /**
+     * @brief Construtor da classe EditorWindow.
+     * 
+     * @param W Largura da janela.
+     * @param H Altura da janela.
+     * @param title Título da janela.
+     */
     EditorWindow(int W, int H, const char* title);
+
+    /**
+     * @brief Destrutor da classe EditorWindow.
+     */
     ~EditorWindow();
 
-    Fl_Window *replace_dlg;
-    Fl_Input *replace_find;
-    Fl_Input *replace_with;
-    Fl_Button *replace_all;
-    Fl_Return_Button *replace_next;
-    Fl_Button *replace_cancel;
+    // Widgets para a funcionalidade de "Substituir"
+    Fl_Window *replace_dlg;       // Janela de diálogo para substituir texto.
+    Fl_Input *replace_find;       // Campo de entrada para o texto a ser encontrado.
+    Fl_Input *replace_with;       // Campo de entrada para o texto de substituição.
+    Fl_Button *replace_all;       // Botão para substituir todas as ocorrências.
+    Fl_Return_Button *replace_next; // Botão para substituir a próxima ocorrência.
+    Fl_Button *replace_cancel;    // Botão para cancelar a operação de substituição.
 
+    // Widget principal do editor de texto.
     Fl_Text_Editor *editor;
+
+    // Buffer para armazenar o texto da busca.
     char search[256];
 };
 
+// Declaração de função externa para carregar um arquivo.
 void load_file(char*, int);
 
+// Declaração de um buffer de texto externo, usado para armazenar o conteúdo do editor.
 extern Fl_Text_Buffer *textbuf;
