@@ -1,5 +1,7 @@
 // Inclusão do cabeçalho da classe da janela do editor.
-#include <models/EditorWindow/EditorWindow.hpp>
+#include <FL/Fl.H>
+#include <iostream>
+#include "models/EditorWindow/EditorWindow.hpp"
 
 /**
  * @brief Função principal do programa.
@@ -10,8 +12,11 @@
  */
 int main(int argc, char **argv)
 {
+  // Obte largura e altura da tela principal
+  int screen_width = Fl::w();
+  int screen_height = Fl::h();
   // Cria uma nova instância da janela do editor com dimensões 640x400.
-  EditorWindow *window = new EditorWindow(640, 400, "Text Editor");
+  EditorWindow *window = new EditorWindow(screen_width, screen_height, "Text Editor");
 
   // Exibe a janela.
   window->show(1, argv);

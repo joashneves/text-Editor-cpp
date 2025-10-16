@@ -13,7 +13,7 @@ SRCS = main.cpp models/EditorWindow/EditorWindow.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Compiler flags
-CXXFLAGS = -std=c++11 -Wall -I.
+CXXFLAGS = -std=c++17 -Wall -I.
 CXXFLAGS += $(shell fltk-config --cxxflags)
 
 # Linker flags
