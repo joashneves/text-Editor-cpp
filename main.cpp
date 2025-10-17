@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   // Cria uma nova instância da janela do editor com dimensões 640x400.
   EditorWindow *window = new EditorWindow(screen_width, screen_height, "Text Editor");
 
-  // Exibe a janela.
+  // Exibe a janela. Do aplicativo.
   window->show(1, argv);
 
   // Se um nome de arquivo foi passado como argumento na linha de comando,

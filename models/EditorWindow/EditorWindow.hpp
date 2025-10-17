@@ -53,11 +53,15 @@ public:
     Fl_Text_Editor *editor;
 
     // Buffer para armazenar o texto da busca.
-    char search[256];
+    std::string search;
 };
 
 // Declaração de função externa para carregar um arquivo.
-void load_file(char*, int);
+void load_file(const char*, int);
 
 // Declaração de um buffer de texto externo, usado para armazenar o conteúdo do editor.
 extern Fl_Text_Buffer *textbuf;
+
+void find_cb(Fl_Widget* w, void* v);
+
+void delete_cb(Fl_Widget*, void* v);

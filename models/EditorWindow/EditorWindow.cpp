@@ -3,8 +3,8 @@
 
 int changed = 0;
 Fl_Text_Buffer *textbuf = new Fl_Text_Buffer();
-char filename[256] = "";
-char title[256] = "";
+std::string filename = "";
+std::string title = "";
 
 // Função de callback para mudança no texto
 void changed_cb(int, int nInserted, int nDeleted,int, const char*, void* v) {
@@ -15,12 +15,12 @@ void changed_cb(int, int nInserted, int nDeleted,int, const char*, void* v) {
   std::cout << nInserted << '\n';
 }
 
-void save_file(char *newfile){
+void save_file(const char *newfile){
   if (textbuf->savefile(newfile)){
-    fl_alert("Erro ao salvar o arquivo \'%s\' :\n%s", newfile, strerror(errno));
+    fl_alert("Erro ao salvar o arquivo '%s' :\n%s", newfile, strerror(errno));
   }
   else {
-    strcpy(filename, newfile);
+    filename = newfile;
   }
   changed = 0;
   textbuf->call_modify_callbacks();
@@ -28,16 +28,16 @@ void save_file(char *newfile){
 
 void saveas_cb(void){
   char *newfile;
-  newfile = fl_file_chooser("Salva arquivo? ", "*", filename);
+  newfile = fl_file_chooser("Salva arquivo? ", "*", filename.c_str());
   if (newfile != NULL) save_file(newfile);
 }
 
 void save_cb(void) {
-  if(filename[0] == '\0'){
+  if(filename.empty()){
     saveas_cb();
     return;
   }
-  else save_file(filename);
+  else save_file(filename.c_str());
 }
 
 int check_save(void){
@@ -53,7 +53,7 @@ int check_save(void){
 // Callbacks de menu vazios por enquanto
 void new_cb(Fl_Widget*, void*) {
   if(!check_save()) return;
-  filename[0] = '\0';
+  filename.clear();
   textbuf->select(0, textbuf->length());
   textbuf->remove_selection();
   changed = 0;
@@ -61,17 +61,18 @@ void new_cb(Fl_Widget*, void*) {
 }
 
 int loading = 0;
-void load_file(char *newfile, int ipos){
+void load_file(const char *newfile, int ipos){
   loading =1;
   int insert = (ipos != -1);
   changed = insert;
-  if(!insert) strcpy(filename, "");
+  if(!insert) filename.clear();
   int r;
   if(!insert) r = textbuf->loadfile(newfile);
   if(r){
-    fl_alert("Erro ao carregar o arquivo \'%s\' : \n%s.", newfile, strerror(errno));
-  }else{
-    if(!insert) strcpy(filename, newfile);
+    fl_alert("Erro ao carregar o arquivo '%s' : \n%s.", newfile, strerror(errno));
+  }
+  else{
+    if(!insert) filename = newfile;
   }
   loading = 0;
   textbuf->call_modify_callbacks();
@@ -81,7 +82,7 @@ void load_file(char *newfile, int ipos){
 void open_cb(Fl_Widget*, void*) {
   if(!check_save()) return;
 
-  char *newfile = fl_file_chooser("Abrir arquivo?", "*", filename);
+  char *newfile = fl_file_chooser("Abrir arquivo?", "*", filename.c_str());
   if(newfile != NULL) load_file(newfile, -1);
 }
 
@@ -181,59 +182,56 @@ void delete_cb(Fl_Widget*, void* v) {
 
 void find2_cb(Fl_Widget* w, void* v) {
   EditorWindow* e = (EditorWindow*)v;
-  if (e->search[0] == '\0') {
+  if (e->search.empty()) {
     // Search string is blank; get a new one...
-    find2_cb(w, v);
+    find_cb(w, v);
     return;
   }
 
   int pos = e->editor->insert_position();
-  int found = textbuf->search_forward(pos, e->search, &pos);
+  int found = textbuf->search_forward(pos, e->search.c_str(), &pos);
   if (found) {
     // Found a match; select and update the position...
-    textbuf->select(pos, pos+strlen(e->search));
-    e->editor->insert_position(pos+strlen(e->search));
+    textbuf->select(pos, pos+e->search.length());
+    e->editor->insert_position(pos+e->search.length());
     e->editor->show_insert_position();
   }
-  else fl_alert("No occurrences of \'%s\' found!", e->search);
+  else fl_alert("No occurrences of '%s' found!", e->search.c_str());
 }
 
 void find_cb(Fl_Widget* w, void* v) {
-EditorWindow* e = (EditorWindow*)v;
-const char *val;
+  EditorWindow* e = (EditorWindow*)v;
+  const char *val;
 
-val = fl_input("Search String:", e->search);
-if (val != NULL) {
-// User entered a string - go find it!
-strcpy(e->search, val);
-find2_cb(w, v);
+  val = fl_input("Search String:", e->search.c_str());
+  if (val != NULL) {
+    // User entered a string - go find it!
+    e->search = val;
+    find2_cb(w, v);
+  }
 }
 
-int pos = e->editor->insert_position();
-int found = textbuf->search_forward(pos, e->search, &pos);
-if (found) {
-// Found a match; select and update the position...
-textbuf->select(pos, pos+strlen(e->search));
-e->editor->insert_position(pos+strlen(e->search));
-e->editor->show_insert_position();
-}
-else fl_alert("No occurrences of \'%s\' found!", e->search);
-}
 void set_title(Fl_Window* w){
-  if(filename[0] == '\0'){
-    strcpy(title, "Untitled");
-  }
-  else{
-    char *slash;
-    slash = strrchr(filename, '/');
+  if (filename.empty()) {
+    title = "Untitled";
+  } else {
+    size_t slash_pos = filename.rfind('/');
     #ifdef WIN32
-    if(slash == NULL)slash = strrchr(filename, '\\');
+    if (slash_pos == std::string::npos) {
+        slash_pos = filename.rfind('\\');
+    }
     #endif
-    if(slash != NULL) strcpy(title, slash + 1);
-    else strcpy(title, filename); 
+    if (slash_pos != std::string::npos) {
+      title = filename.substr(slash_pos + 1);
+    } else {
+      title = filename;
+    }
   }
-  if (changed) strcat(title, " (Modificado)");
-  w->label(title);
+
+  if (changed) {
+    title += " (Modificado)";
+  }
+  w->label(title.c_str());
 }
 
 
